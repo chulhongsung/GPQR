@@ -2,19 +2,8 @@ rm(list = ls())
 gc(reset = TRUE)
 
 if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
-# if(!require(MASS)) install.packages('MASS'); library(MASS)
-
-load("C:/Users/UOS/Desktop/porfolio/example_kospi_dat.Rdata")
-
-# return_table = lapply(example_kospi_dat, function(x) (lag(x, 0) - lag(x, 1))/lag(x, 0)) %>% bind_cols() %>% as.matrix() %>% .[-1,1:10]
-
-# head(return_table)
-
-# simul_mat <- return_table[1:100,]
 
 group_index = c(1, 1, 2, 1, 2, 1, 2, 3, 3, 3)
-
-# example_data = return_table[,sample(ncol(return_table), 10, replace = F)]
 
 set.seed(1)
 
