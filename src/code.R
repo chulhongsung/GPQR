@@ -72,11 +72,13 @@ while(j <= 10000){
   dual_term = c(dual_term,  t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat))
   
   if(j == 1){
+    cat('=========================================================', '\n')
     cat('initial loss: ', loss, '\n')
     cat('=========================================================', '\n')
   } 
   
   if(j %% 1000 == 0){
+    cat('=========================================================', '\n')
     cat('iteration ', j, '\n')
     cat('loss: ', loss, '\n')
   }
@@ -151,6 +153,7 @@ while(j <= 10000){
   }
   
   if(all(c(kkt1, kkt2, kkt3, kkt4) == TRUE)){
+    cat('=========================================================', '\n')
     cat('iteration ', j, ' Converge!', '\n' )
     cat('KKT condition stationarity1: ', kkt1, '\n')
     cat('KKT condition stationarity2: ', kkt2 ,'\n')
