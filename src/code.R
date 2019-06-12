@@ -162,14 +162,3 @@ while(j <= 10000){
   
   j =  j + 1
 }
-
-tmp_beta
-
-sum(tmp_beta)
-
-mu %*% tmp_beta
-
-tmp_z1
-
-tmp_z2
-
