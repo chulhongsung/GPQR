@@ -10,7 +10,7 @@ set.seed(1)
 simul_mat = matrix(c(rnorm(400, 0.1, 0.1), rnorm(300, 0, 0.1), rnorm(300, 0, 0.01)), nrow = 100)
 
 #### unchangeable
-mu_zero = 0.02
+mu_zero = 0.05
 
 mu = colMeans(simul_mat)
 
@@ -30,7 +30,7 @@ pl = group_index %>% table %>% sqrt %>% as.vector()
 
 tau = 0.5; rho = 0.5
 
-lambda_1 = 3; lambda_2 = 1
+lambda_1 = 2; lambda_2 = 1
 
 lr1 = 0.01
 
@@ -50,7 +50,7 @@ tmp_beta_tilde = c(tmp_beta_0, tmp_beta)
 
 norm_vec <- function(x) sqrt(sum(x^2))
 
-for(j in seq_len(20000)){
+for(j in seq_len(10000)){
   
   if( j == 1){
     tmp_z1 = tmp_z[1:p]
@@ -64,7 +64,6 @@ for(j in seq_len(20000)){
       (rho/2) * norm_vec(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)^2
     cat('initial loss:: ', loss_init, '\n')
   }
-  
   #### step 1
   i = 1
   
@@ -89,15 +88,17 @@ for(j in seq_len(20000)){
   
   v1 = v[1:p]
   
-  tmp_z1 = if_else(abs(tmp_z[1:p] - lr1 * (rho * (tmp_z[1:p] - v1) - tmp_u[1:p])) <= lambda_1,  0,
-                   tmp_z[1:p] - lr1 * (rho * (tmp_z[1:p] - v1) - tmp_u[1:p]) - lambda_1 * sign(tmp_z[1:p] - lr1 * (rho * (tmp_z[1:p] - v1) - tmp_u[1:p]) - lambda_1))
+  
+  tmp_z1 = v1 + tmp_u[1:p]/rho
+  
+  tmp_z1 = if_else(abs(tmp_z1) <= lambda_1, 0, tmp_z1 - lambda_1 * sign(tmp_z1 - lambda_1))
   
   #### step 3
   
   v2 = v[(p+1):(2*p)]
   u2 = tmp_u[(p+1):(2*p)]
   
-  tmp_z2 = tmp_z[(p+1):(2*p)] - lr2 * (rho * (tmp_z[(p+1):(2*p)] - v2) - u2)
+  tmp_z2 = v2 + u2/rho
   
   for (l in unique(group_index)){
     pll = pl[l]
@@ -124,24 +125,15 @@ for(j in seq_len(20000)){
   if( j %% 1000 == 0){
     cat(j, 'loss:: ', loss, 'dual term:: ',  t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat),'\n')
     cat('stationary for beta', abs(stationary_for_beta) <= 1e-4, '\n')
-    }
+  }
 }
 
 tmp_beta
 
-tmp_z1
-
-tmp_z2
-
-t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) 
+sum(tmp_beta)
 
 mu %*% tmp_beta
 
-# primal feasibility 
-Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat
+tmp_z1
 
-sum(tmp_beta)
-
-
-
-
+tmp_z2
