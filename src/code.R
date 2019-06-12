@@ -154,12 +154,13 @@ while(j <= 10000){
   
   if(all(c(kkt1, kkt2, kkt3, kkt4) == TRUE)){
     cat('=========================================================', '\n')
-    cat('iteration ', j, ' Converge!', '\n' )
+    cat('iteration ', j, ' KKT condition satisfied!', '\n' )
     cat('KKT condition stationarity1: ', kkt1, '\n')
     cat('KKT condition stationarity2: ', kkt2 ,'\n')
     cat('KKT condition stationarity3: ', kkt3, '\n')
     cat('KKT condition dual feasibility: ',  kkt4, '\n')
     cat('=========================================================', '\n')
+    solution = list(beta = tmp_beta_tilde, z = tmp_z, u = tmp_u)
     break
   }
   
