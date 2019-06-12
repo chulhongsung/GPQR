@@ -31,7 +31,7 @@ pl = group_index %>% table %>% sqrt %>% as.vector()
 
 tau = 0.5; rho = 0.7
 
-lambda_1 = 2; lambda_2 = 2
+lambda_1 = 1; lambda_2 = 20
 
 #### initial value
 
@@ -47,7 +47,11 @@ tmp_beta_tilde = c(tmp_beta_0, tmp_beta)
 
 norm_vec <- function(x) sqrt(sum(x^2))
 
-for(j in seq_len(3000)){
+loss_ = c()
+
+dual_term = c()
+
+for(j in seq_len(10000)){
   
   #### Loss function
   
@@ -60,6 +64,10 @@ for(j in seq_len(3000)){
     lambda_2 * sum(pl * tapply(tmp_z2, group_index, function(x) norm_vec(x))) + 
     t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) + 
     (rho/2) * norm_vec(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)^2
+  
+  loss_ = c(loss_, loss)
+  
+  dual_term = c(dual_term,  t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat))
   
   if(j == 1){
     cat('initial loss::', loss, '\n')
@@ -88,7 +96,7 @@ for(j in seq_len(3000)){
     rho * t(Amat %*% K) %*% ((Amat %*% K) %*% tmp_beta_tilde + Bmat %*% tmp_z - Cmat)
   
   if(j %% 100 == 0){
-    cat('KKT condition for stationarity(beta)::  ', abs(gradient_beta) <= 1e-4 ,'\n')
+    cat('KKT condition stationarity(beta)::  ', abs(gradient_beta) <= 1e-4 ,'\n')
   }
   
   tmp_beta = tmp_beta_tilde[-1]
@@ -102,7 +110,7 @@ for(j in seq_len(3000)){
   tmp_z1 = if_else(abs(tmp_z1) <= lambda_1, 0, tmp_z1 - lambda_1 * sign(tmp_z1 - lambda_1))
   
   if(j %% 100 == 0){
-    cat('KKT condition for stationarity(z1)::  ', abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1 ,'\n')
+    cat('KKT condition stationarity(z1)::  ', abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1 ,'\n')
   }
   
   #### step 3
@@ -123,15 +131,19 @@ for(j in seq_len(3000)){
   }
   
   if(j %% 100 == 0){
-    cat('KKT condition for stationary(z2)::  ', tapply(tmp_z2, group_index, function(x) norm_vec(x)) <= lambda_2 ,'\n')
-    cat('==========================================================================================================', '\n')
+    cat('KKT condition stationary(z2)::  ', tapply(tmp_z2, group_index, function(x) norm_vec(x)) <= lambda_2 ,'\n')
   }
   tmp_z = c(tmp_z1, tmp_z2)
   
   #### step 4
   tmp_u = tmp_u + rho * (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)
   
+  if(j %% 100 == 0){
+    cat('KKT condition dual feasibility::  ', abs(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) <= 1e-4 ,'\n')
+    cat('==========================================================================================================', '\n')
+  }
 }
+
 tmp_beta
 
 sum(tmp_beta)
@@ -141,3 +153,4 @@ mu %*% tmp_beta
 tmp_z1
 
 tmp_z2
+
