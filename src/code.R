@@ -51,7 +51,9 @@ loss_ = c()
 
 dual_term = c()
 
-for(j in seq_len(10000)){
+j = 1
+
+while(j <= 10000){
   
   #### Loss function
   
@@ -70,13 +72,13 @@ for(j in seq_len(10000)){
   dual_term = c(dual_term,  t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat))
   
   if(j == 1){
-    cat('initial loss::', loss, '\n')
-    cat('==========================================================================================================', '\n')
+    cat('initial loss: ', loss, '\n')
+    cat('=========================================================', '\n')
   } 
   
-  if(j %% 100 == 0){
+  if(j %% 1000 == 0){
     cat('iteration ', j, '\n')
-    cat('loss:: ', loss, 'dual term:: ',  t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat),'\n')
+    cat('loss: ', loss, '\n')
   }
   #### step 1
   i = 1
@@ -95,8 +97,9 @@ for(j in seq_len(10000)){
   gradient_beta = tau * X_tilde %*% I(t(X_tilde) %*% tmp_beta_tilde >= 0) - (1 - tau) * X_tilde %*% I(t(X_tilde) %*% tmp_beta_tilde < 0) + t(Amat %*% K) %*% tmp_u +
     rho * t(Amat %*% K) %*% ((Amat %*% K) %*% tmp_beta_tilde + Bmat %*% tmp_z - Cmat)
   
-  if(j %% 100 == 0){
-    cat('KKT condition stationarity(beta)::  ', abs(gradient_beta) <= 1e-4 ,'\n')
+  kkt1 = all(abs(gradient_beta) <= 1e-4)
+  if(j %% 1000 == 0){
+    cat('KKT condition stationarity1: ', kkt1, '\n')
   }
   
   tmp_beta = tmp_beta_tilde[-1]
@@ -109,8 +112,10 @@ for(j in seq_len(10000)){
   
   tmp_z1 = if_else(abs(tmp_z1) <= lambda_1, 0, tmp_z1 - lambda_1 * sign(tmp_z1 - lambda_1))
   
-  if(j %% 100 == 0){
-    cat('KKT condition stationarity(z1)::  ', abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1 ,'\n')
+  kkt2 = all(abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1)
+  
+  if(j %% 1000 == 0){
+    cat('KKT condition stationarity2: ', kkt2 ,'\n')
   }
   
   #### step 3
@@ -130,18 +135,32 @@ for(j in seq_len(10000)){
     } else {tmp_z2[group_index == l] = 0 }
   }
   
-  if(j %% 100 == 0){
-    cat('KKT condition stationary(z2)::  ', tapply(tmp_z2, group_index, function(x) norm_vec(x)) <= lambda_2 ,'\n')
+  kkt3 = all(tapply(tmp_z2, group_index, function(x) norm_vec(x)) <= lambda_2)
+  if(j %% 1000 == 0){
+    cat('KKT condition stationarity3: ', kkt3, '\n')
   }
   tmp_z = c(tmp_z1, tmp_z2)
   
   #### step 4
   tmp_u = tmp_u + rho * (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)
   
-  if(j %% 100 == 0){
-    cat('KKT condition dual feasibility::  ', abs(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) <= 1e-4 ,'\n')
-    cat('==========================================================================================================', '\n')
+  kkt4 = all(abs(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) <= 1e-4)
+  if(j %% 1000 == 0){
+    cat('KKT condition dual feasibility: ',  kkt4, '\n')
+    cat('=========================================================', '\n')
   }
+  
+  if(all(c(kkt1, kkt2, kkt3, kkt4) == TRUE)){
+    cat('iteration ', j, ' Converge!', '\n' )
+    cat('KKT condition stationarity1: ', kkt1, '\n')
+    cat('KKT condition stationarity2: ', kkt2 ,'\n')
+    cat('KKT condition stationarity3: ', kkt3, '\n')
+    cat('KKT condition dual feasibility: ',  kkt4, '\n')
+    cat('=========================================================', '\n')
+    break
+  }
+  
+  j =  j + 1
 }
 
 tmp_beta
