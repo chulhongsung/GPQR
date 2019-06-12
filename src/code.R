@@ -47,10 +47,6 @@ tmp_beta_tilde = c(tmp_beta_0, tmp_beta)
 
 norm_vec <- function(x) sqrt(sum(x^2))
 
-loss_ = c()
-
-dual_term = c()
-
 j = 1
 
 while(j <= 10000){
@@ -66,10 +62,6 @@ while(j <= 10000){
     lambda_2 * sum(pl * tapply(tmp_z2, group_index, function(x) norm_vec(x))) + 
     t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) + 
     (rho/2) * norm_vec(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)^2
-  
-  loss_ = c(loss_, loss)
-  
-  dual_term = c(dual_term,  t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat))
   
   if(j == 1){
     cat('=========================================================', '\n')
