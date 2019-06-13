@@ -3,7 +3,7 @@ gc(reset = TRUE)
 
 if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
 
-
+#### sgl.fit function
 
 sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.8, lambda_1, lambda_2, verbose = TRUE){
   
