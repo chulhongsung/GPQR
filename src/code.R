@@ -3,17 +3,11 @@ gc(reset = TRUE)
 
 if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
 
-group_index = c(1, 1, 1, 1, 2, 2, 2, 3, 3, 3)
 
-set.seed(1)
-
-#### Simulation data matrix
-
-simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.3, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
-
-#### Design matrix & constraints
 
 sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.8, lambda_1, lambda_2, verbose = TRUE){
+  
+  #### Design matrix & constraints
   
   mu = colMeans(data)
   
@@ -164,5 +158,18 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.8, lambda_1, lambda_
   cat('Solution does not converges in 10000 iterations!')
 }
 
+#### Fit SGL
+
+group_index = c(1, 1, 1, 1, 2, 2, 2, 3, 3, 3)
+
+set.seed(1)
+
+#### Simulation data matrix
+
+simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.3, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
+
 a = sgl.fit(simul_mat, group_index = group_index, mu_zero = 0.2, tau = 0.5, lambda_1 = 3, lambda_2 = 3, verbose = F)
 
+#### Optimal solution
+
+a$solution
