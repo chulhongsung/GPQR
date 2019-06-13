@@ -154,6 +154,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
   }
   
   cat('Solution does not converges in', iter, 'iterations!', '\n')
+  
   return(list(current_solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u))))
 }
 
@@ -167,7 +168,7 @@ set.seed(1)
 
 simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.1, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
 
-fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=10)
+fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=1)
 
 #### Optimal solution
 fit$solution
