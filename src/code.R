@@ -169,7 +169,7 @@ set.seed(1)
 
 simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.1, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
 
-fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=20)
+fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=10)
 
 #### Optimal solution
 fit$solution
