@@ -10,31 +10,20 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
   #### Design matrix & constraints
   
   mu = colMeans(data)
-  
   n = nrow(data); p = ncol(data)
-  
   Amat = rbind(diag(p), diag(p), 1, c(mu))
-  
   Bmat = rbind(-diag(2*p), 0, 0)
-  
   Cmat = c(rep(0, 2*p), 1, mu_zero)
-  
   X_tilde = t(cbind(-1, data))
-  
   K = cbind(0, diag(p)) 
-  
   pl = group_index %>% table %>% sqrt %>% as.vector()
   
   #### Initial value
   
   tmp_z = rep(1, 2*p)/p
-  
   tmp_u = rep(0, 2*p+2)
-  
   tmp_beta = rep(1, p)/p
-  
   tmp_beta_0 = 0
-  
   tmp_beta_tilde = c(tmp_beta_0, tmp_beta)
   
   norm_vec <- function(x) sqrt(sum(x^2))
@@ -46,7 +35,6 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     #### Loss function
     
     tmp_z1 = tmp_z[1:p]
-    
     tmp_z2 = tmp_z[(p+1):(2*p)]
     
     loss = sum(tau * (t(X_tilde) %*% tmp_beta_tilde) * I(t(X_tilde) %*% tmp_beta_tilde >= 0) + (1-tau)*(-t(X_tilde) %*% tmp_beta_tilde)*I(t(X_tilde) %*% tmp_beta_tilde < 0)) + 
@@ -72,7 +60,6 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     while(i <= 10){
       
       tmp_W = if_else(abs(((t(X_tilde) %*% tmp_beta_tilde)*4)) <= 1e-5, 100000, abs(1/((t(X_tilde) %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
-      
       tmp_beta_tilde = (-1/2) * solve(X_tilde %*% tmp_W %*% t(X_tilde) + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
         ((tau - 1/2) * X_tilde %*% rep(1, n) + rho * t(Amat %*% K) %*% ((1/rho) * tmp_u + Bmat %*% tmp_z - Cmat))
       
@@ -91,11 +78,9 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     tmp_beta = tmp_beta_tilde[-1]
     
     v = (Amat %*% tmp_beta - Cmat)
-    
     v1 = v[1:p]
     
     tmp_z1 = v1 + tmp_u[1:p]/rho
-    
     tmp_z1 = if_else(abs(tmp_z1) <= lambda_1, 0, tmp_z1 - lambda_1 * sign(tmp_z1 - lambda_1))
     
     kkt2 = all(abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1)
@@ -126,6 +111,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     if((verbose != FALSE) & (j %% 1000 == 0)){
       cat('KKT condition stationarity3: ', kkt3, '\n')
     }
+    
     tmp_z = c(tmp_z1, tmp_z2)
     
     #### Step 4
