@@ -5,7 +5,7 @@ if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
 
 #### sgl.fit function
 
-sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_2, verbose = TRUE){
+sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_2, iter = 10000, verbose = TRUE){
   
   #### Design matrix & constraints
   
@@ -41,7 +41,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
   
   j = 1
   
-  while(j <= 10000){
+  while(j <= iter){
     
     #### Loss function
     
@@ -147,7 +147,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
       cat('KKT condition dual feasibility: ',  kkt4, '\n')
       cat('=========================================================', '\n')
       
-      return(solution = list(solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u))))
+      return(list(solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u))))
       
       break
     }
@@ -155,7 +155,8 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     j =  j + 1
   }
   
-  cat('Solution does not converges in 10000 iterations!')
+  cat('Solution does not converges in', iter, 'iterations!', '\n')
+  return(list(current_solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u))))
 }
 
 #### Fit SGL
@@ -166,10 +167,9 @@ set.seed(1)
 
 #### Simulation data matrix
 
-simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.3, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
+simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.1, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
 
-fit = sgl.fit(simul_mat, group_index = group_index, mu_zero = 0.2, tau = 0.5, rho = 0.5, lambda_1 = 0.5, lambda_2 = 1)
+fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=20)
 
 #### Optimal solution
-
 fit$solution
