@@ -5,7 +5,7 @@ if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
 
 #### sgl.fit function
 
-sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.8, lambda_1, lambda_2, verbose = TRUE){
+sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_2, verbose = TRUE){
   
   #### Design matrix & constraints
   
@@ -168,8 +168,8 @@ set.seed(1)
 
 simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.3, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
 
-a = sgl.fit(simul_mat, group_index = group_index, mu_zero = 0.2, tau = 0.5, lambda_1 = 3, lambda_2 = 3, verbose = F)
+fit = sgl.fit(simul_mat, group_index = group_index, mu_zero = 0.2, tau = 0.5, rho = 0.5, lambda_1 = 0.5, lambda_2 = 1)
 
 #### Optimal solution
 
-a$solution
+fit$solution
