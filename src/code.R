@@ -29,9 +29,9 @@ K = cbind(0, diag(p))
 
 pl = group_index %>% table %>% sqrt %>% as.vector()
 
-tau = 0.5; rho = 0.7
+tau = 0.5; rho = 0.8
 
-lambda_1 = 1; lambda_2 = 20
+lambda_1 = 1; lambda_2 = 3
 
 #### initial value
 
@@ -146,7 +146,7 @@ while(j <= 10000){
   
   if(all(c(kkt1, kkt2, kkt3, kkt4) == TRUE)){
     cat('=========================================================', '\n')
-    cat('iteration ', j, ' KKT condition satisfied!', '\n' )
+    cat('iteration ', j, 'loss: ', loss,' KKT condition satisfied!', '\n' )
     cat('KKT condition stationarity1: ', kkt1, '\n')
     cat('KKT condition stationarity2: ', kkt2 ,'\n')
     cat('KKT condition stationarity3: ', kkt3, '\n')
@@ -158,3 +158,6 @@ while(j <= 10000){
   
   j =  j + 1
 }
+
+solution
+loss
