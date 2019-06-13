@@ -147,9 +147,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
       cat('KKT condition dual feasibility: ',  kkt4, '\n')
       cat('=========================================================', '\n')
       
-      return(list(solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u))))
-      
-      break
+      return(list(solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u)))); break
     }
     
     j =  j + 1
