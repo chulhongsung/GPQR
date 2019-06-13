@@ -5,13 +5,15 @@ if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
 
 group_index = c(1, 1, 1, 1, 2, 2, 2, 3, 3, 3)
 
-set.seed(2)
+set.seed(1)
 
-simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.1, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
+#### Simulation data matrix
 
-#### unchangeable
+simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.3, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
 
-mu_zero = 0.1
+#### Design matrix & constraints
+
+mu_zero = 0.2
 
 mu = colMeans(simul_mat)
 
@@ -31,9 +33,9 @@ pl = group_index %>% table %>% sqrt %>% as.vector()
 
 tau = 0.5; rho = 0.8
 
-lambda_1 = 1; lambda_2 = 3
+lambda_1 = 1; lambda_2 = 10
 
-#### initial value
+#### Initial value
 
 tmp_z = rep(1, 2*p)/p
 
@@ -74,7 +76,7 @@ while(j <= 10000){
     cat('iteration ', j, '\n')
     cat('loss: ', loss, '\n')
   }
-  #### step 1
+  #### Step 1
   i = 1
   
   while(i <= 10){
@@ -87,7 +89,7 @@ while(j <= 10000){
     i = i +1
   }
   
-  #### step 2
+  #### Step 2
   gradient_beta = tau * X_tilde %*% I(t(X_tilde) %*% tmp_beta_tilde >= 0) - (1 - tau) * X_tilde %*% I(t(X_tilde) %*% tmp_beta_tilde < 0) + t(Amat %*% K) %*% tmp_u +
     rho * t(Amat %*% K) %*% ((Amat %*% K) %*% tmp_beta_tilde + Bmat %*% tmp_z - Cmat)
   
@@ -112,7 +114,7 @@ while(j <= 10000){
     cat('KKT condition stationarity2: ', kkt2 ,'\n')
   }
   
-  #### step 3
+  #### Step 3
   
   v2 = v[(p+1):(2*p)]
   u2 = tmp_u[(p+1):(2*p)]
@@ -135,7 +137,7 @@ while(j <= 10000){
   }
   tmp_z = c(tmp_z1, tmp_z2)
   
-  #### step 4
+  #### Step 4
   tmp_u = tmp_u + rho * (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)
   
   kkt4 = all(abs(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) <= 1e-4)
@@ -159,5 +161,5 @@ while(j <= 10000){
   j =  j + 1
 }
 
+#### Optimal solution
 solution
-loss
