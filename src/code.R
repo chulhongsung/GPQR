@@ -57,7 +57,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     #### Step 1
     i = 1
     
-    while(i <= 100){
+    while(i <= 10){
       
       tmp_W = if_else(abs(((t(X_tilde) %*% tmp_beta_tilde)*4)) <= 1e-5, 100000, abs(1/((t(X_tilde) %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
       tmp_beta_tilde = (-1/2) * solve(X_tilde %*% tmp_W %*% t(X_tilde) + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
@@ -156,7 +156,7 @@ set.seed(1)
 
 simul_mat = matrix(c(rnorm(400, 0.1, 0.01), rnorm(100, 0.1, 0.01), rnorm(200, 0, 0.01), rnorm(300, 0, 0.01)), nrow = 100)
 
-fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=1)
+fit = sgl.fit(data=simul_mat, group_index=group_index, mu_zero=0.1, tau=0.5, rho=0.8, lambda_1=1, lambda_2=1, num = 1)
 
 #### Optimal solution
 fit$solution
