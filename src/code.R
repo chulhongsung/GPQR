@@ -5,7 +5,7 @@ if(!require(tidyverse)) install.packages('tidyverse'); library(tidyverse)
 
 #### sgl.fit function
 
-sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_2, iter = 10000, verbose = TRUE){
+sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_2, iter = 10000, verbose = TRUE, num = 1000){
   
   #### Design matrix & constraints
   
@@ -49,7 +49,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
       cat('=========================================================', '\n')
     } 
     
-    if((verbose != FALSE) & (j %% 1000 == 0)){
+    if((verbose != FALSE) & (j %% num == 0)){
       cat('=========================================================', '\n')
       cat('iteration ', j, '\n')
       cat('loss: ', loss, '\n')
@@ -57,7 +57,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     #### Step 1
     i = 1
     
-    while(i <= 10){
+    while(i <= 100){
       
       tmp_W = if_else(abs(((t(X_tilde) %*% tmp_beta_tilde)*4)) <= 1e-5, 100000, abs(1/((t(X_tilde) %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
       tmp_beta_tilde = (-1/2) * solve(X_tilde %*% tmp_W %*% t(X_tilde) + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
@@ -71,7 +71,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
       rho * t(Amat %*% K) %*% ((Amat %*% K) %*% tmp_beta_tilde + Bmat %*% tmp_z - Cmat)
     
     kkt1 = all(abs(gradient_beta) <= 1e-4)
-    if((verbose != FALSE) & (j %% 1000 == 0)){
+    if((verbose != FALSE) & (j %% num == 0)){
       cat('KKT condition stationarity1: ', kkt1, '\n')
     }
     
@@ -85,7 +85,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     
     kkt2 = all(abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1)
     
-    if((verbose != FALSE) & (j %% 1000 == 0)){
+    if((verbose != FALSE) & (j %% num == 0)){
       cat('KKT condition stationarity2: ', kkt2 ,'\n')
     }
     
@@ -108,7 +108,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     
     kkt3 = all(tapply(tmp_z2, group_index, function(x) norm_vec(x)) <= lambda_2)
     
-    if((verbose != FALSE) & (j %% 1000 == 0)){
+    if((verbose != FALSE) & (j %% num == 0)){
       cat('KKT condition stationarity3: ', kkt3, '\n')
     }
     
@@ -119,7 +119,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     
     kkt4 = all(abs(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) <= 1e-4)
     
-    if((verbose != FALSE) & (j %% 1000 == 0)){
+    if((verbose != FALSE) & (j %% num == 0)){
       cat('KKT condition dual feasibility: ',  kkt4, '\n')
       cat('=========================================================', '\n')
     }
@@ -137,12 +137,14 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     }
     
     j =  j + 1
+    
   }
   
   cat('Solution does not converges in', iter, 'iterations!', '\n')
   
   return(list(current_solution = list(beta = c(tmp_beta_tilde), z = c(tmp_z), u = c(tmp_u))))
 }
+
 
 #### Fit SGL
 
