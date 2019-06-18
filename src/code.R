@@ -14,7 +14,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
   Amat = rbind(diag(p), diag(p), 1, c(mu))
   Bmat = rbind(-diag(2*p), 0, 0)
   Cmat = c(rep(0, 2*p), 1, mu_zero)
-  X_tilde = t(cbind(-1, data))
+  X_tilde = cbind(-1, data)
   K = cbind(0, diag(p)) 
   pl = group_index %>% table %>% sqrt %>% as.vector()
   
@@ -37,7 +37,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     tmp_z1 = tmp_z[1:p]
     tmp_z2 = tmp_z[(p+1):(2*p)]
     
-    loss = sum(tau * (t(X_tilde) %*% tmp_beta_tilde) * I(t(X_tilde) %*% tmp_beta_tilde >= 0) + (1-tau)*(-t(X_tilde) %*% tmp_beta_tilde)*I(t(X_tilde) %*% tmp_beta_tilde < 0)) + 
+    loss = sum(tau * (X_tilde %*% tmp_beta_tilde) * I(X_tilde %*% tmp_beta_tilde >= 0) + (1-tau)*(-X_tilde %*% tmp_beta_tilde)*I(X_tilde %*% tmp_beta_tilde < 0)) + 
       lambda_1 * sum(abs(tmp_z1)) + 
       lambda_2 * sum(pl * tapply(tmp_z2, group_index, function(x) norm_vec(x))) + 
       t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) + 
@@ -57,17 +57,17 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     #### Step 1
     i = 1
     
-    while(i <= 10){
+    while(i <= 100){
       
-      tmp_W = if_else(abs(((t(X_tilde) %*% tmp_beta_tilde)*4)) <= 1e-5, 100000, abs(1/((t(X_tilde) %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
-      tmp_beta_tilde = (-1/2) * solve(X_tilde %*% tmp_W %*% t(X_tilde) + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
-        ((tau - 1/2) * X_tilde %*% rep(1, n) + rho * t(Amat %*% K) %*% ((1/rho) * tmp_u + Bmat %*% tmp_z - Cmat))
+      tmp_W = if_else(abs(((X_tilde %*% tmp_beta_tilde)*4)) <= 1e-5, 100000, abs(1/((X_tilde %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
+      tmp_beta_tilde = (-1/2) * solve(t(X_tilde) %*% tmp_W %*% X_tilde + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
+        ((tau - 1/2) * t(X_tilde) %*% rep(1, n) + rho * t(Amat %*% K) %*% ((1/rho) * tmp_u + Bmat %*% tmp_z - Cmat))
       
       i = i +1
     }
     
     #### Step 2
-    gradient_beta = tau * X_tilde %*% I(t(X_tilde) %*% tmp_beta_tilde >= 0) - (1 - tau) * X_tilde %*% I(t(X_tilde) %*% tmp_beta_tilde < 0) + t(Amat %*% K) %*% tmp_u +
+    gradient_beta = tau * t(X_tilde) %*% I(X_tilde %*% tmp_beta_tilde >= 0) - (1 - tau) * t(X_tilde) %*% I(X_tilde %*% tmp_beta_tilde < 0) + t(Amat %*% K) %*% tmp_u +
       rho * t(Amat %*% K) %*% ((Amat %*% K) %*% tmp_beta_tilde + Bmat %*% tmp_z - Cmat)
     
     kkt1 = all(abs(gradient_beta) <= 1e-4)
