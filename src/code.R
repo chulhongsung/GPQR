@@ -67,8 +67,8 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     }
     
     #### Step 2
-    gradient_beta = tau * t(X_tilde) %*% I(X_tilde %*% tmp_beta_tilde >= 0) - (1 - tau) * t(X_tilde) %*% I(X_tilde %*% tmp_beta_tilde < 0) + t(Amat %*% K) %*% tmp_u +
-      rho * t(Amat %*% K) %*% ((Amat %*% K) %*% tmp_beta_tilde + Bmat %*% tmp_z - Cmat)
+    gradient_beta = tau * t(X_tilde) %*% I(X_tilde %*% tmp_beta_tilde >= 0) - (1 - tau) * t(X_tilde) %*% I(X_tilde %*% tmp_beta_tilde < 0) + 
+      rho * t(Amat %*% K) %*% (Amat %*% K) %*% tmp_beta_tilde + rho * t(Amat %*% K) %*% ((1/rho) * tmp_u + Bmat %*% tmp_z - Cmat)
     
     kkt1 = all(abs(gradient_beta) <= 1e-4)
     if((verbose != FALSE) & (j %% num == 0)){
