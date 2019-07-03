@@ -59,7 +59,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     
     while(i <= 100){
       
-      tmp_W = if_else(abs(((X_tilde %*% tmp_beta_tilde)*4)) <= 1e-5, 100000, abs(1/((X_tilde %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
+      tmp_W = if_else(abs(((X_tilde %*% tmp_beta_tilde)*4)) <= 1e-8, 100000000, abs(1/((X_tilde %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
       tmp_beta_tilde = (-1/2) * solve(t(X_tilde) %*% tmp_W %*% X_tilde + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
         ((tau - 1/2) * t(X_tilde) %*% rep(1, n) + rho * t(Amat %*% K) %*% ((1/rho) * tmp_u + Bmat %*% tmp_z - Cmat))
       
