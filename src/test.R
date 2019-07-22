@@ -5,6 +5,8 @@ library(dplyr)
 
 return_table = lapply(example_kospi_dat, function(x) log(lag(x, 1)/lag(x, 0))) %>% bind_cols() %>% as.matrix() %>% .[-1,1:10] %>% .[1:100,]
 
+data = return_table
+
 mu = colMeans(data)
 mu_zero = 0.02
 n = nrow(data); p = ncol(data)
