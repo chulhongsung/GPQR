@@ -60,8 +60,18 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     while(i <= 100){
       
       tmp_W = if_else(abs(((X_tilde %*% tmp_beta_tilde)*4)) <= 1e-8, 100000000, abs(1/((X_tilde %*% tmp_beta_tilde)*4))) %>% as.vector() %>% diag()
+      
       tmp_beta_tilde = (-1/2) * solve(t(X_tilde) %*% tmp_W %*% X_tilde + (rho/2) * t(Amat %*% K) %*% (Amat %*% K)) %*%
         ((tau - 1/2) * t(X_tilde) %*% rep(1, n) + rho * t(Amat %*% K) %*% ((1/rho) * tmp_u + Bmat %*% tmp_z - Cmat))
+      
+      loss_for_beta0 = function(X, tmp_beta, tmp_beta_zero, tau, tmp_u, tmp_z, Amat, Bmat, Cmat){
+        tau * t(X %*% tmp_beta - tmp_beta_zero) %*% I(X %*% tmp_beta - tmp_beta_zero >= 0) - (1-tau) * t(X %*% tmp_beta - tmp_beta_zero) %*% I(X %*% tmp_beta - tmp_beta_zero < 0) +
+          t(tmp_u) %*% (Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat) +
+          (rho/2) * norm_vec(Amat %*% tmp_beta + Bmat %*% tmp_z - Cmat)^2 }
+      
+      tmp_beta_zero = optimize(loss_for_beta0, c(-10, 10), X = data, tmp_beta = tmp_beta_tilde[-1], tau = tau, tmp_z = tmp_z, tmp_u = tmp_u, Amat = Amat, Bmat = Bmat, Cmat = Cmat)$minimum
+      
+      tmp_beta_tilde = c(tmp_beta_zero, tmp_beta_tilde[-1])
       
       i = i +1
     }
