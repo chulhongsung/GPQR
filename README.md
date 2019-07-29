@@ -1,2 +1,2 @@
-# SGL
+# SGLasso
 sparse group lasso
