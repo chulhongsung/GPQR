@@ -91,7 +91,7 @@ sgl.fit = function(data, group_index, mu_zero, tau, rho = 0.5, lambda_1, lambda_
     v1 = v[1:p]
     
     tmp_z1 = v1 + tmp_u[1:p]/rho
-    tmp_z1 = if_else(abs(tmp_z1) <= lambda_1, 0, tmp_z1 - lambda_1 * sign(tmp_z1 - lambda_1))
+    tmp_z1 = if_else(abs(tmp_z1) <= lambda_1, 0, tmp_z1 - lambda_1 * sign(tmp_z1))
     
     kkt2 = all(abs(rho * (tmp_z1 - v1) - tmp_u[1:p]) <= lambda_1)
     
