@@ -1,2 +1,1 @@
-# SGLasso
-sparse group lasso
+# GPQR
