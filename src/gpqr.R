@@ -1,4 +1,3 @@
-
 if(!require(dplyr)) install.packages('dplyr'); library(dplyr)
 
 #### sgl.fit function
